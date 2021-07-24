@@ -10,7 +10,7 @@ from tensorflow.keras.layers import Dense, Dropout, LSTM
 from tensorflow.keras.models import Sequential
 
 crypto_currency = 'BTC'
-pair_currency = 'USD'
+pair_currency = 'EUR'
 
 start = dt.datetime(2016,1,1)
 end = dt.datetime.now()
@@ -33,6 +33,17 @@ for x in range(prediction_days, len(scaled_data)):
 x_train, y_train = np.array(x_train), np.array(y_train)
 x_train = np.reshape(x_train, (x_train.shape[0], x_train.shape[1],1))
 
+"""
+EXPERIMENTAL
+For predicting a non-next day price use this chunk of code, and comment the upper one
+
+Dont forget to plot at the plot  + future_day interval
+
+future_day = 30
+for x in range(prediction_days, len(scaled_data)-future_day):
+    x_train.append(scaled_data[x-prediction_days:x, 0])
+    y_train.append(scaled_data[x+future_day, 0])
+"""
 
 #building neural network, working with long short term memory
 
@@ -75,17 +86,22 @@ x_test = np.reshape(x_test, (x_test.shape[0], x_test.shape[1], 1))
 prediction_prices = model.predict(x_test)
 prediction_prices = scaler.inverse_transform(prediction_prices)
 
-plt.plot(actual_prices, color='black', label='Actual prices')
-plt.plot(prediction_prices, color='yellow', label='Prediction prices')
+plt.plot(actual_prices, color='purple', label='Actual prices')
+plt.plot(prediction_prices, color='green', label='Prediction prices')
 plt.xlabel('Time')
 plt.ylabel('Price')
+plt.title('Od lakote wallet')
 plt.legend(loc='upper left')
 plt.show()
 
 #predicting next day
+real_data = [model_inputs[len(model_inputs) + 1 - prediction_days:len(model_inputs) + 1, 0]]
+real_data = np.array(real_data)
+real_data = np.reshape(real_data, (real_data.shape[0], real_data.shape[1], 1))
 
-
-
+prediction = model.predict(real_data)
+prediction = scaler.inverse_transform(prediction)
+print(prediction)
 
 
 
